@@ -9,13 +9,11 @@
  * Percent calculation
  */
 
-exports.calc = (value, total, decimal, sign) => {
-  const badNumbers = [NaN, Infinity, -Infinity];
+exports.calc = function (value, total, decimal, sign) {
+  var badNumbers = [NaN, Infinity, -Infinity];
 
   // Avoid argument type problems
-  if (typeof value !== 'number' ||
-      typeof total !== 'number' ||
-      typeof decimal !== 'number') {
+  if (typeof value !== 'number' || typeof total !== 'number' || typeof decimal !== 'number') {
     return null;
   }
 
@@ -25,11 +23,11 @@ exports.calc = (value, total, decimal, sign) => {
   }
 
   // Avoid wrong numbers
-  badNumbers.forEach((number) => {
-    if ([value, total, decimal].indexOf(number) > -1) {
-      return number;
+  for (var i = 0; i < badNumbers.length; i++) {
+    if ([value, total, decimal].indexOf(badNumbers[i]) > -1) {
+      return badNumbers[i];
     }
-  });
+  }
 
   // Define the sign
   if (typeof sign !== 'string') {
@@ -46,9 +44,8 @@ exports.calc = (value, total, decimal, sign) => {
 // Supreme percent regexp
 exports.re = /^\s?[-+]?(\d*[.|,])*?\d+\s?%?\s?$/;
 
-exports.valid = (value) => {
-  if (typeof value === 'number' ||
-      (typeof value === 'string' && value.match(exports.re))) {
+exports.valid = function (value) {
+  if (typeof value === 'number' || typeof value === 'string' && value.match(exports.re)) {
     return true;
   }
 
@@ -59,10 +56,9 @@ exports.valid = (value) => {
  * Add percent sign
  */
 
-exports.sign = (value) => {
-  if (typeof value === 'number' ||
-      (typeof value === 'string' && !value.match(/%/g))) {
-    return `${value}%`;
+exports.sign = function (value) {
+  if (typeof value === 'number' || typeof value === 'string' && !value.match(/%/g)) {
+    return value + '%';
   }
 
   return value;
@@ -72,7 +68,7 @@ exports.sign = (value) => {
  * Clean the percent
  */
 
-exports.unsign = (value) => {
+exports.unsign = function (value) {
   if (typeof value === 'string') {
     return value.replace(/%/g, '');
   }
@@ -80,7 +76,7 @@ exports.unsign = (value) => {
   return value;
 };
 
-exports.clean = (value) => {
+exports.clean = function (value) {
   value = exports.unsign(value);
 
   if (typeof value === 'string') {
@@ -90,11 +86,11 @@ exports.clean = (value) => {
   return value;
 };
 
-exports.convert = (value, negative) => {
+exports.convert = function (value, negative) {
   value = exports.clean(value);
 
   if (exports.valid(value)) {
-    return negative ? -value : value;
+    return negative ? -value : +value;
   }
 
   return value;
@@ -104,52 +100,47 @@ exports.convert = (value, negative) => {
  * Percent comparision
  */
 
-exports.lt = (l, t) => {
-  if (exports.valid(l) && exports.valid(t) &&
-      exports.convert(l) < exports.convert(t)) {
+exports.lt = function (l, t) {
+  if (exports.valid(l) && exports.valid(t) && exports.convert(l) < exports.convert(t)) {
     return true;
   }
 
   return false;
 };
 
-exports.gt = (g, t) => {
-  if (exports.valid(g) && exports.valid(t) &&
-      exports.convert(g) > exports.convert(t)) {
+exports.gt = function (g, t) {
+  if (exports.valid(g) && exports.valid(t) && exports.convert(g) > exports.convert(t)) {
     return true;
   }
 
   return false;
 };
 
-exports.eq = (e, q) => {
-  if (exports.valid(e) && exports.valid(q) &&
-      exports.convert(e) == exports.convert(q)) {
+exports.eq = function (e, q) {
+  if (exports.valid(e) && exports.valid(q) && exports.convert(e) == exports.convert(q)) {
     return true;
   }
 
   return false;
 };
 
-exports.neq = (ne, q) => {
-  if (exports.valid(ne) && exports.valid(q) &&
-      exports.convert(ne) != exports.convert(q)) {
+exports.neq = function (ne, q) {
+  if (exports.valid(ne) && exports.valid(q) && exports.convert(ne) != exports.convert(q)) {
     return true;
   }
 
   return false;
 };
 
-exports.satisfies = (value, min, max) => {
+exports.satisfies = function (value, min, max) {
   // Sort min and max by size
   if (min > max) {
-    max = [min, min = max][0];
+    var _min = min;
+    min = max;
+    max = _min;
   }
 
-  if (exports.valid(value) &&
-      exports.valid(min) && exports.valid(max) &&
-      exports.convert(value) >= exports.convert(min) &&
-      exports.convert(value) <= exports.convert(max)) {
+  if (exports.valid(value) && exports.valid(min) && exports.valid(max) && exports.convert(value) >= exports.convert(min) && exports.convert(value) <= exports.convert(max)) {
     return true;
   }
 
